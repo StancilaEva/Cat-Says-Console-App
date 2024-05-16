@@ -17,7 +17,7 @@ class Program
         {
             ValidatePath(arguments);
 
-            string path = ExtractPath(arguments);
+            string path = ExtractApiUrl(arguments);
 
             using (HttpClient client = new HttpClient())
             {
@@ -57,7 +57,7 @@ class Program
         arguments.OutputPath = pathValidationService.ValidatePath(arguments.OutputPath);
     }
 
-    private static string ExtractPath(Arguments arguments)
+    private static string ExtractApiUrl(Arguments arguments)
     {
         string path = BaseCatUrl;
 
