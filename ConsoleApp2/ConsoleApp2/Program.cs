@@ -16,22 +16,8 @@ class Program
         try
         {
             ValidatePath(arguments);
-
-            string path = ExtractApiUrl(arguments);
-
-            using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage responseMessage = await client.GetAsync(path);
-
-                if (responseMessage.IsSuccessStatusCode)
-                {
-                    await WriteResponseToDisk(arguments, responseMessage);
-                }
-                else
-                {
-                    throw new Exception(responseMessage.StatusCode.ToString());
-                }
-            }
+            string path = GetApiUrl(arguments);
+            await FetchAndWriteCatImageAsync(arguments, path);
         }
         catch (Exception e)
         {
@@ -39,7 +25,24 @@ class Program
         }
     }
 
-    private static async Task WriteResponseToDisk(Arguments arguments, HttpResponseMessage responseMessage)
+    private static async Task FetchAndWriteCatImageAsync(Arguments arguments, string path)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            HttpResponseMessage responseMessage = await client.GetAsync(path);
+
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                await WriteResponseToDiskAsync(arguments, responseMessage);
+            }
+            else
+            {
+                throw new Exception($"Request to fetch cat image has failed with code: {responseMessage.StatusCode}");
+            }
+        }
+    }
+
+    private static async Task WriteResponseToDiskAsync(Arguments arguments, HttpResponseMessage responseMessage)
     {
         using (Stream contentStream = await responseMessage.Content.ReadAsStreamAsync())
         {
@@ -57,15 +60,8 @@ class Program
         arguments.OutputPath = pathValidationService.ValidatePath(arguments.OutputPath);
     }
 
-    private static string ExtractApiUrl(Arguments arguments)
+    private static string GetApiUrl(Arguments arguments)
     {
-        string path = BaseCatUrl;
-
-        if (!string.IsNullOrWhiteSpace(arguments.CatSaysText))
-        {
-            path += $"/says/{arguments.CatSaysText}";
-        }
-
-        return path;
+        return string.IsNullOrWhiteSpace(arguments.CatSaysText) ? BaseCatUrl : $"{BaseCatUrl}/says/{arguments.CatSaysText}";
     }
 }
