@@ -3,7 +3,7 @@ namespace ConsoleApp2.utils
 {
     public class PathValidationService
     {
-        private readonly List<string> approvedPathCatImagesExtensions = new List<string>() { ".jpg", ".png", ".jpeg" };
+        private readonly HashSet<string> approvedPathCatImagesExtensions = new HashSet<string>() { ".jpg", ".png", ".jpeg" };
 
         public string ValidatePath(string path)
         {
@@ -13,7 +13,7 @@ namespace ConsoleApp2.utils
             {
                 path += ".jpg";
             }
-            else if (!approvedPathCatImagesExtensions.Any(a => a.Equals(extension)))
+            else if (!approvedPathCatImagesExtensions.Contains(extension))
             {
                 throw new Exception(".jpg, .png, .jpeg extensions only");
             }
