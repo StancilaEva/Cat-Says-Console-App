@@ -5,6 +5,7 @@ using ConsoleApp2.utils;
 class Program
 {
     private const string BaseCatUrl = "https://cataas.com/cat";
+    private readonly static HttpClient _httpClient = new HttpClient();  
     static async Task Main(string[] args)
     {
         await Parser.Default.ParseArguments<Arguments>(args)
@@ -27,9 +28,7 @@ class Program
 
     private static async Task FetchAndWriteCatImageAsync(Arguments arguments, string path)
     {
-        using (HttpClient client = new HttpClient())
-        {
-            HttpResponseMessage responseMessage = await client.GetAsync(path);
+            HttpResponseMessage responseMessage = await _httpClient.GetAsync(path);
 
             if (responseMessage.IsSuccessStatusCode)
             {
@@ -39,7 +38,6 @@ class Program
             {
                 throw new Exception($"Request to fetch cat image has failed with code: {responseMessage.StatusCode}");
             }
-        }
     }
 
     private static async Task WriteResponseToDiskAsync(Arguments arguments, HttpResponseMessage responseMessage)
